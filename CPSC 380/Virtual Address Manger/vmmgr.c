@@ -99,10 +99,10 @@ int main(int argc, char* argv[]){
 
             totalAccesses++;
             int page_offset = logicalAddress & 0xFF;
-            int loadFrame = getLoadFrame(logicalAddress, b_Store);
-            int physicalAddress = (loadFrame * FRAME_SIZE) + page_offset;
+            int frameNum = getLoadFrame(logicalAddress, b_Store);
+            int physicalAddress = (frameNum * FRAME_SIZE) + page_offset;
 
-            char signedByte = physicalMemory[loadFrame][page_offset];
+            char signedByte = physicalMemory[frameNum][page_offset];
 
             printf("Logical Address: %d, Physical Address: %d, signedByte: %c \n", logicalAddress, physicalAddress, signedByte);
         }
