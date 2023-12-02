@@ -99,7 +99,7 @@ int main(int argc, char* argv[]){
 
             totalAccesses++;
             int page_offset = logicalAddress & 0xFF;
-            int loadFrame = translateAddress(logicalAddress, b_Store);
+            int loadFrame = getLoadFrame(logicalAddress, b_Store);
             int physicalAddress = (loadFrame * FRAME_SIZE) + page_offset;
 
             char signedByte = physicalMemory[loadFrame][page_offset];
