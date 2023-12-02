@@ -7,13 +7,13 @@
 #define TLB_SIZE 16
 #define NUM_FRAMES 256
 
-int pageTable[PAGE_SIZE];
+int pageTable[FRAME_SIZE];
 int TLB[TLB_SIZE][2];
 int currentTLBSize = 0;
 int pageFaultCount = 0;
 int TLBHitCount = 0;
 int totalAccesses = 0;
-int physicalMemory[NUM_FRAMES][FRAME_SIZE];
+char physicalMemory[NUM_FRAMES][FRAME_SIZE];
 int currentPhysicalMemoryPos = 0;
 
 void checkTLB(){
@@ -22,9 +22,8 @@ void checkTLB(){
 
 }
 
-void pageFault(int pageNumber, int page_offset){
+void pageFault(int pageNumber, FILE *b_Store){
 
-    FILE *b_Store = fopen("BACKING_STORE.bin", "rb");
 
     if(b_Store == NULL){
         printf("Couldn't open file! \n");
@@ -44,14 +43,14 @@ void pageFault(int pageNumber, int page_offset){
         physicalMemory[currentPhysicalMemoryPos][i] = buffer[i];
     }
 
-    pageTable[pageNumber] = pageNumber;
+    pageTable[pageNumber] = currentPhysicalMemoryPos;
     currentPhysicalMemoryPos++;
 
     fclose(b_Store);
 
 }
 
-int translateAddress(int logicalAddress){
+int translateAddress(int logicalAddress, FILE *b_Store){
 
     int pageNumber = (logicalAddress >> 8) & 0xFF;
     int page_offset = logicalAddress & 0xFF;
@@ -64,7 +63,7 @@ int translateAddress(int logicalAddress){
     if(pageTable[pageNumber] == -1){
 
         pageFaultCount++;
-        pageFault(pageNumber, page_offset);
+        pageFault(pageNumber, b_Store);
     }
 
     int physicalAddress = (pageTable[pageNumber] * FRAME_SIZE) + page_offset;
@@ -80,14 +79,18 @@ int main(int argc, char* argv[]){
     }
 
     FILE *addressFile = fopen(argv[1], "r");
+    FILE *b_Store = fopen("BACKING_STORE.bin", "rb");
 
     if(addressFile == NULL){
         printf("ERROR: couldn't open address file, try again! \n");
         exit(0);
     }
 
-    memset(pageTable, -1, sizeof(pageTable));
-    memset(TLB, -1, TLB_SIZE * 2 * sizeof(TLB[0][0]));
+    for(int i = 0; i < sizeof(pageTable[0]); i++){
+        pageTable[i] = -1;
+    }
+
+    // memset(TLB, -1, TLB_SIZE * 2 * sizeof(TLB[0][0]));
 
     char lineOfData[256];
     int logicalAddress;
@@ -97,7 +100,7 @@ int main(int argc, char* argv[]){
         if (sscanf(lineOfData, "%d", &logicalAddress) == 1) {
 
             totalAccesses++;
-            int physicalAddress = translateAddress(logicalAddress);
+            int physicalAddress = translateAddress(logicalAddress, b_Store);
 
             printf("%d\n", logicalAddress);
         }
