@@ -14,7 +14,7 @@ int pageFaultCount = 0;
 int TLBHitCount = 0;
 int totalAccesses = 0;
 char physicalMemory[NUM_FRAMES][FRAME_SIZE];
-int currentPhysicalMemoryPos = 0;
+int currentFrameNum = 0;
 
 void checkTLB(){
 
@@ -35,18 +35,17 @@ void pageFault(int pageNumber, FILE *b_Store){
     fread(buffer, sizeof(buffer), 1, b_Store);
 
     for(int i = 0; i < 256; i++){
-        physicalMemory[currentPhysicalMemoryPos][i] = buffer[i];
+        physicalMemory[currentFrameNum][i] = buffer[i];
     }
 
-    pageTable[pageNumber] = currentPhysicalMemoryPos;
-    currentPhysicalMemoryPos++;
+    pageTable[pageNumber] = currentFrameNum;
+    currentFrameNum++;
 
 }
 
-int translateAddress(int logicalAddress, FILE *b_Store){
+int getLoadFrame(int logicalAddress, FILE *b_Store){
 
     int pageNumber = (logicalAddress >> 8) & 0xFF;
-    int page_offset = logicalAddress & 0xFF;
 
     if(pageNumber < 0 || pageNumber >= PAGE_SIZE){
         printf("ERROR: Page number out of bounds \n");
@@ -59,9 +58,7 @@ int translateAddress(int logicalAddress, FILE *b_Store){
         pageFault(pageNumber, b_Store);
     }
 
-    int physicalAddress = (pageTable[pageNumber] * FRAME_SIZE) + page_offset;
-
-    return physicalAddress;
+    return pageTable[pageNumber];
 }
 
 int main(int argc, char* argv[]){
@@ -101,9 +98,13 @@ int main(int argc, char* argv[]){
         if (sscanf(lineOfData, "%d", &logicalAddress) == 1) {
 
             totalAccesses++;
-            int physicalAddress = translateAddress(logicalAddress, b_Store);
+            int page_offset = logicalAddress & 0xFF;
+            int loadFrame = translateAddress(logicalAddress, b_Store);
+            int physicalAddress = (loadFrame * FRAME_SIZE) + page_offset;
 
-            printf("%d\n", logicalAddress);
+            char signedByte = physicalMemory[loadFrame][page_offset];
+
+            printf("Logical Address: %d, Physical Address: %d, signedByte: %c \n", logicalAddress, physicalAddress, signedByte);
         }
         else {
             // Handle parsing error
