@@ -25,11 +25,6 @@ void checkTLB(){
 void pageFault(int pageNumber, FILE *b_Store){
 
 
-    if(b_Store == NULL){
-        printf("Couldn't open file! \n");
-        exit(0);
-    }
-
     signed char buffer[256];
 
     if(fseek(b_Store, pageNumber * PAGE_SIZE, SEEK_SET) != 0){
@@ -45,8 +40,6 @@ void pageFault(int pageNumber, FILE *b_Store){
 
     pageTable[pageNumber] = currentPhysicalMemoryPos;
     currentPhysicalMemoryPos++;
-
-    fclose(b_Store);
 
 }
 
@@ -86,6 +79,11 @@ int main(int argc, char* argv[]){
         exit(0);
     }
 
+    if(b_Store == NULL){
+        printf("Couldn't open file! \n");
+        exit(0);
+    }
+
     for(int i = 0; i < sizeof(pageTable[0]); i++){
         pageTable[i] = -1;
     }
@@ -111,6 +109,7 @@ int main(int argc, char* argv[]){
     }
 
     fclose(addressFile);
+    fclose(b_Store);
 
     return 0;
 }
