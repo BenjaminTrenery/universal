@@ -72,15 +72,18 @@ int main(int argc, char* argv[]){
     }
 
     FILE *addressFile = fopen(argv[1], "r");
-    FILE *b_Store = fopen("BACKING_STORE.bin", "rb");
 
     if(addressFile == NULL){
         printf("ERROR: couldn't open address file, try again! \n");
+        fclose(addressFile);
         exit(0);
     }
+    
+    FILE *b_Store = fopen("BACKING_STORE.bin", "rb");
 
     if(b_Store == NULL){
         printf("Couldn't open file! \n");
+        fclose(b_Store);
         exit(0);
     }
 
