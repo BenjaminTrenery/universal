@@ -185,7 +185,7 @@ def getDFATransitionsFromStateList(inputStateList):
             DFAStateList.sort()
             
             for DFAState in DFAStateList:
-                getEpsilonTransitionsFromState(DFAState)
+                findAllEpsilonTransitions(DFAState)
                 
             for epsilonState in epsilonTransitionStates:
                 
