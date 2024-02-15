@@ -2,5 +2,6 @@
     "files.associations": {
         "typeinfo": "c",
         "task.h": "c"
-    }
+    },
+    "remote.autoForwardPortsFallback": 0
 }
