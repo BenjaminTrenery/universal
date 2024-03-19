@@ -3,5 +3,7 @@
         "typeinfo": "c",
         "task.h": "c"
     },
-    "remote.autoForwardPortsFallback": 0
+    "remote.autoForwardPortsFallback": 0,
+    "terminal.integrated.gpuAcceleration": "on",
+    "terminal.integrated.enableImages": true
 }
