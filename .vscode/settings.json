@@ -4,6 +4,7 @@
         "task.h": "c"
     },
     "remote.autoForwardPortsFallback": 0,
-    "terminal.integrated.gpuAcceleration": "on",
-    "terminal.integrated.enableImages": true
+    "terminal.integrated.gpuAcceleration": "auto",
+    "terminal.integrated.enableImages": true,
+    "git.ignoreLimitWarning": true
 }
